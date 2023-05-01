@@ -6,16 +6,51 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import User
+from rest_framework.permissions import IsAdminUser
 from rest_framework.authtoken.models import Token
 
 for user in User.objects.all():
     Token.objects.get_or_create(user=user)
 
 
+class ListUsersView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = UserSerializer
+    # queryset = User.objects.all()
+    def get_queryset(self):
+        return User.objects.filter(is_superuser=False)
+
+    
+class GetUserView(APIView):
+    permission_classes = [IsAdminUser]
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    
+
 class CreateUserView(generics.CreateAPIView):
+    permission_classes = [IsAdminUser]
     serializer_class = UserSerializer
 
 
+class DeleteUserView(generics.DestroyAPIView):
+    permission_classes = [IsAdminUser]
+    def delete(self, request, *args, **kwargs):
+        try:
+            user_id = kwargs['user_id']
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        user.delete()
+        return Response({'detail': 'User deleted successfully.'})
+    
+    
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
