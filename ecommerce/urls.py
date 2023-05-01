@@ -23,7 +23,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('users/', include('users.urls')),
     path('/', include('shared.urls')),
-    path('orders/', include('orders.urls')),
+    path('order/', include('order.urls')),
     path('payments/', include('payments.urls')),
     path('products/', include('products.urls')),
     path('cart/', include('cart.urls')),
