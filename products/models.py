@@ -1,5 +1,5 @@
 from django.db import models
-from shared.models import Category
+from category.models import Category
 
 class Product(models.Model):
     name = models.CharField(max_length=255)

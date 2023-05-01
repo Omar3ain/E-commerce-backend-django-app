@@ -40,11 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
-    'shared',
+    'category',
     'payments',
     'products',
     'cart',
     'order',
+    'wishlist',
 ]
 
 MIDDLEWARE = [

@@ -1,13 +1,13 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Cart, CartItems
+from .models import Cart, CartItem
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
 
-class CartItemsSerializer(serializers.ModelSerializer):
+class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CartItems
+        model = CartItem
         fields = '__all__'
