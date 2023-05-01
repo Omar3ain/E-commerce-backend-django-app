@@ -5,7 +5,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import Token
+from .models import User
+from rest_framework.authtoken.models import Token
+
+for user in User.objects.all():
+    Token.objects.get_or_create(user=user)
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -14,14 +18,14 @@ class CreateUserView(generics.CreateAPIView):
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
+        username = request.data.get('username')
         password = request.data.get('password')
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             try:
-                token = Token.objects.get(user=user)
+                token = Token.objects.get_or_create(user=user)
             except Token.DoesNotExist:
-                token = Token.objects.create(user=user)
+                print('Token does not exist')
             return Response({'token': token.key})
         else:
-            return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
