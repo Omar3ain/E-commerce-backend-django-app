@@ -36,7 +36,15 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+    def has_module_perms(self, app_label):
+        # return True if the user has any permissions for the given app label
+        return self.is_active and self.is_staff
 
+    def has_perm(self, perm, obj=None):
+        # return True if the user has the specified permission
+        return self.is_active and self.is_superuser
+    
 class Token(models.Model):
     key = models.CharField(max_length=40, primary_key=True)
     user = models.OneToOneField(User, related_name='user_tokens', on_delete=models.CASCADE)

@@ -4,3 +4,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+
+class Wishlist(models.Model):
+    product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
+    user_id = models.ForeignKey('users.User', on_delete=models.CASCADE)
