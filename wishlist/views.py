@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from ecommerce.permission import IsOwnerOrReadOnly
+from products.models import Product
 # Create your views here.
 
 class WishlistView(APIView):
@@ -19,16 +20,32 @@ class WishlistView(APIView):
         serializer = wishlistSerializer(wish_list, many=True)
         return Response({"wishlist":serializer.data})
 
-    def post(self, request):
-        request.data['user_id'] = request.user.id
-        # self.check_object_permissions(request, request.user.id)
-        serializer = wishlistSerializer(data=request.data)
+class addProduct(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+    def post(self, request, product_id):
+        self.check_object_permissions(request, request.user)
+        try:
+            Product.objects.get(id=product_id)
+        except:
+            return Response({"error":"product doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        product_exists = Wishlist.objects.filter(product=product_id, user_id=request.user.id).first()
+
+        if product_exists:
+            return Response({"error":"already in wishlist"}, status=status.HTTP_404_NOT_FOUND)
+
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            request.data['user_id'] = request.user.id
+            request.data['product'] =product_id
+            serializer = wishlistSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+
 
 
 class WishlistItemView(APIView):
