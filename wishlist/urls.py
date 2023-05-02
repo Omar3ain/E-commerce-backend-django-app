@@ -1,3 +1,6 @@
 from django.urls import path
-
-urlpatterns = []
+from .views import WishlistView, WishlistItemView
+urlpatterns = [
+    path('', WishlistView.as_view()),
+    path('<int:pk>', WishlistItemView.as_view())
+]
