@@ -1,12 +1,13 @@
 from rest_framework import generics
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from .serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import User
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from ecommerce.permission import IsOwnerOrReadOnly
 from rest_framework.authtoken.models import Token
 
 for user in User.objects.all():
@@ -20,6 +21,23 @@ class ListUsersView(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.filter(is_superuser=False)
 
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    
+    def get(self, request, user_id, *args, **kwargs):
+        user = get_object_or_404(User, id=user_id)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    def patch(self, request, user_id, *args, **kwargs):
+        user = get_object_or_404(User, id=user_id)
+        self.check_object_permissions(request, user)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class GetUserView(APIView):
     permission_classes = [IsAdminUser]
