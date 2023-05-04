@@ -10,7 +10,6 @@ STATUS_CHOICES = [
 class Order(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.IntegerField()
-    paid = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0])
     createdAt = models.DateTimeField(auto_now_add=True)
 

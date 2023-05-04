@@ -8,9 +8,10 @@ from ecommerce.permission import IsOwnerOrReadOnly
 from django.db import transaction
 from cart.models import Cart, CartItem
 from products.models import Product
+from payments.models import Payment
+import logging
 
-
-class CreateOrder(APIView):
+class HandleOrder(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     
     def post(self, request):
@@ -52,10 +53,29 @@ class CreateOrder(APIView):
             return Response({"error": 'order not found'}, status=status.HTTP_404_NOT_FOUND)
         except OrderItem.DoesNotExist:
             return Response({"error": 'order item not found'}, status=status.HTTP_404_NOT_FOUND)
-
         
-    
+    def delete(self, request, orderId):
+        self.check_object_permissions(request, request.user)
+        orderExists = Payment.objects.filter(order=orderId).exists()
+        if not orderExists:
+            try:
+                order = Order.objects.filter(id=orderId).first()
+                orderItems = OrderItem.objects.filter(order=orderId)
+                for item in orderItems:
+                    product = Product.objects.get(id=item.product.id)
+                    product.quantity += item.quantity
+                    product.save()
+                order.delete()
+                return Response({'success': "order canceled successfully"})
+            except OrderItem.DoesNotExist:
+                return Response({"error": 'order item not found'}, status=status.HTTP_404_NOT_FOUND)
+            except Order.DoesNotExist:
+                return Response({"error": 'order not found'}, status=status.HTTP_404_NOT_FOUND)
+            except Product.DoesNotExist:
+                return Response({"error": 'product not found'}, status=status.HTTP_404_NOT_FOUND)
+                # except Exception as e:
+                #     return Response({"error": e}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error": "Can't cancel this order"}, status=status.HTTP_400_BAD_REQUEST)
 
-#cancel order before payment
-##cancel order => free, paid
-#return payment - fee
+

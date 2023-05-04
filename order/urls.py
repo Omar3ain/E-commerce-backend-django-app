@@ -1,6 +1,7 @@
 from django.urls import include, path
-from .views import CreateOrder
+from .views import HandleOrder
 urlpatterns = [
-  path('', CreateOrder.as_view()),
-  path('payments/', include('payments.urls'))
-]
+  path('', HandleOrder.as_view()),
+  path('<int:orderId>', HandleOrder.as_view()),
+  path('payment/', include('payments.urls'))
+] 
