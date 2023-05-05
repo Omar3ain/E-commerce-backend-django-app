@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import User
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from ecommerce.permission import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from ecommerce.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
 from rest_framework.authtoken.models import Token
 
 for user in User.objects.all():
@@ -52,7 +52,8 @@ class GetUserView(APIView):
     
 
 class CreateUserView(generics.CreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser | AllowAny]
+    permission_classes = [IsAdminOrUnauthenticatedUser]
     serializer_class = UserSerializer
 
 
