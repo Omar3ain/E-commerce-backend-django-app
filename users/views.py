@@ -9,6 +9,9 @@ from .models import User
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from ecommerce.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 
 for user in User.objects.all():
     Token.objects.get_or_create(user=user)
@@ -84,3 +87,24 @@ class LoginView(APIView):
             return Response({'token': token.key})
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        # Create a dictionary containing the user data
+        user_data = {
+            'username': user.username,
+            'email': user.email,
+            'dob': user.dob,
+            'phone': user.phone,
+            'address': user.address,
+        }
+        # Merge the user data with the token data
+        response_data = {'token': token.key, **user_data}
+        return Response(response_data)
