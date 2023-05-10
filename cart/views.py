@@ -70,12 +70,8 @@ class GetCart(APIView):
 
 
 class DeleteCartItem(APIView):
-    
+
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    
-    # def increaseProduct(self, product):
-    #     product.quantity += 1
-    #     product.save()
     
     def delete(self, request, cartitem):
         try:
@@ -87,10 +83,37 @@ class DeleteCartItem(APIView):
                 cartItem.save()
                 if cartItem.quantity == 0:
                     cartItem.delete()
-                # product = Product.objects.get(id=cartItem.product_id.id)
-                # if product:
-                #     self.increaseProduct(product)
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                if(cartItem.id):
+                    serializer = CartItemSerializer(cartItem)
+                    return Response({"item": serializer.data}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"id": cartitem}, status=status.HTTP_200_OK)
+            elif cartItem.quantity < 0:
+                return Response({"error": "Invalid quantity for cart item"}, status=status.HTTP_400_BAD_REQUEST)
+        except CartItem.DoesNotExist:
+            return Response({"error": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Cart.DoesNotExist:
+            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": "internal server error", "errorMessage": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class AddQuantity(APIView):
+    
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    
+    def put(self, request, cartitem):
+        try:
+            self.check_object_permissions(request, request.user)
+            cart = Cart.objects.get(user_id=request.user.id)
+            cartItem = CartItem.objects.get(cart_id=cart.id, id=cartitem)
+            if cartItem.quantity < cartItem.product_id.quantity:
+                cartItem.quantity += 1
+                cartItem.save()
+                serializer = CartItemSerializer(cartItem)
+                return Response({"item": serializer.data}, status=status.HTTP_200_OK)
             elif cartItem.quantity < 0:
                 return Response({"error": "Invalid quantity for cart item"}, status=status.HTTP_400_BAD_REQUEST)
         except CartItem.DoesNotExist:
