@@ -112,9 +112,7 @@ class CustomAuthToken(ObtainAuthToken):
         }
         # Merge the user data with the token data
         response_data = {
-            'data': {
-                'token': token.key, 
-                **user_data
-            }
+            'token': token.key, 
+            **user_data
         }
         return Response(response_data)
