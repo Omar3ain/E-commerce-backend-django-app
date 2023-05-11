@@ -37,7 +37,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
     dob = models.DateField(null=True, blank=True)
-    image = models.ImageField(upload_to='user_images', null=True, blank=True)
+    image = models.FileField(upload_to='user_images', null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -50,7 +50,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.email
+        return self.name
     
     def has_module_perms(self, app_label):
         # return True if the user has any permissions for the given app label
