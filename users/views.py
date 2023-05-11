@@ -98,11 +98,13 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         # Create a dictionary containing the user data
         user_data = {
+            'name': user.name,
             'username': user.username,
             'email': user.email,
             'dob': user.dob,
             'phone': user.phone,
             'address': user.address,
+            'image' : user.image,
         }
         # Merge the user data with the token data
         response_data = {
