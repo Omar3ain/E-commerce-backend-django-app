@@ -1,3 +1,5 @@
+import base64
+import requests
 from rest_framework import generics
 from django.shortcuts import get_object_or_404, render
 from .serializers import UserSerializer
@@ -97,6 +99,8 @@ class CustomAuthToken(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         # Create a dictionary containing the user data
+        image_url = user.image.url  # or user.image.path, depending on your storage backend
+        
         user_data = {
             'name': user.name,
             'username': user.username,
@@ -104,7 +108,7 @@ class CustomAuthToken(ObtainAuthToken):
             'dob': user.dob,
             'phone': user.phone,
             'address': user.address,
-            'image' : user.image,
+            'image': image_url,
         }
         # Merge the user data with the token data
         response_data = {
