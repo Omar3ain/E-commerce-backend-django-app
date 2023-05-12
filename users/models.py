@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from django.core.validators import RegexValidator
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -33,12 +34,14 @@ class UserManager(BaseUserManager):
         return username.lower()
 
 class User(AbstractBaseUser):
+    phone_regex = RegexValidator(regex=r'^\d{1,20}$', message="Phone number should contain only digits.")
+
     name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
     dob = models.DateField(null=True, blank=True)
     image = models.FileField(upload_to='user_images', null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_regex])
     address = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
