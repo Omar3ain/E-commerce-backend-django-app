@@ -1,6 +1,5 @@
 from django.urls import include, path
 from .views import CreateUserView, GetUserView, ListUsersView, DeleteUserView, UserProfileView, CustomAuthToken
-# from rest_framework.authtoken.views import obtain_auth_token
 from django.conf import settings
 from django.conf.urls.static import static
 

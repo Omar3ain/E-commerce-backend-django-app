@@ -1,5 +1,3 @@
-import base64
-import requests
 from rest_framework import generics
 from django.shortcuts import get_object_or_404, render
 from .serializers import UserSerializer
@@ -22,7 +20,6 @@ for user in User.objects.all():
 class ListUsersView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = UserSerializer
-    # queryset = User.objects.all()
     def get_queryset(self):
         return User.objects.filter(is_superuser=False)
 

@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.core.validators import RegexValidator
+from django_countries.fields import CountryField
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -43,6 +44,11 @@ class User(AbstractBaseUser):
     image = models.FileField(upload_to='user_images', null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_regex])
     address = models.TextField(null=True, blank=True)
+    country = CountryField(null=True)
+    street_name = models.TextField(null=True)
+    building_no =models.IntegerField(null=True)
+    floor_no =models.IntegerField(null=True)    
+    apartment_no =models.IntegerField(null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -62,8 +68,3 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         # return True if the user has the specified permission
         return self.is_active and self.is_superuser
-    
-# class Token(models.Model):
-#     key = models.CharField(max_length=40, primary_key=True)
-#     user = models.OneToOneField(User, related_name='user_tokens', on_delete=models.CASCADE)
-#     created = models.DateTimeField(auto_now_add=True)

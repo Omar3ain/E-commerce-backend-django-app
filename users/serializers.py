@@ -5,7 +5,7 @@ from datetime import date
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'username', 'email', 'dob', 'image', 'phone', 'address', 'password')
+        fields = ('id', 'name', 'username', 'email', 'dob', 'image', 'phone', 'address', 'password', 'country', 'street_name', 'building_no', 'floor_no', 'apartment_no')
         extra_kwargs = {'password': {'write_only': True}}
 
     def get_age(self, obj):
