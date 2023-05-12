@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'cloudinary_storage',
     'cloudinary',
-    'django_countries'
+    'django_countries',
 ]
 
 MIDDLEWARE = [
