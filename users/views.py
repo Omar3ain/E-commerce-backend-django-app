@@ -10,7 +10,6 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from ecommerce.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 for user in User.objects.all():
@@ -96,8 +95,11 @@ class CustomAuthToken(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         # Create a dictionary containing the user data
-        image_url = user.image.url  # or user.image.path, depending on your storage backend
-        
+        if user.image:
+            image_url = user.image.url  # or user.image.path, depending on your storage backend
+        else:
+            image_url = None
+                    
         user_data = {
             'name': user.name,
             'username': user.username,
@@ -106,6 +108,7 @@ class CustomAuthToken(ObtainAuthToken):
             'phone': user.phone,
             'address': user.address,
             'image': image_url,
+            'isAdmin': user.is_superuser,
         }
         # Merge the user data with the token data
         response_data = {
