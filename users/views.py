@@ -101,6 +101,7 @@ class CustomAuthToken(ObtainAuthToken):
             image_url = None
                     
         user_data = {
+            'id': user.id,
             'name': user.name,
             'username': user.username,
             'email': user.email,

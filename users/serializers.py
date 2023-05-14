@@ -25,9 +25,15 @@ class UserSerializer(serializers.ModelSerializer):
         return dob
 
     def update(self, instance, validated_data):
-        dob = validated_data.get('dob', instance.dob)
-        self.validate_dob(dob)
-        instance.dob = dob
+        instance.name = validated_data.get('name', instance.name)
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.address = validated_data.get('address', instance.address)
+        instance.image = validated_data.get('image', instance.image)
+        instance.dob = validated_data.get('dob', instance.dob)
+        # self.validate_dob(dob)
+        # instance.dob = dob
         instance.save()
         return instance
 
