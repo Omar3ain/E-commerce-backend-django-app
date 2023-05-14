@@ -97,7 +97,7 @@ class DeleteCartItem(APIView):
         except Cart.DoesNotExist:
             return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({"error": "internal server error", "errorMessage": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 class AddQuantity(APIView):
