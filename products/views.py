@@ -6,9 +6,17 @@ from .serializers import ProductSerializer
 from .models import Product
 
 class getProducts(APIView):
-    def get(self, request):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
+    def get(self, request):       
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductSerializer(products, many=True, context={'request': request})
         return Response(serializer.data)
 class GetProductById(APIView):
     def get(self, request, pk):
@@ -17,7 +25,7 @@ class GetProductById(APIView):
         except Product.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ProductSerializer(product)
+        serializer = ProductSerializer(product,context={'request': request})
         return Response(serializer.data)
 class GetProductsByCategoryId(APIView):
     def get(self, request, category_id):
@@ -26,5 +34,5 @@ class GetProductsByCategoryId(APIView):
         except Product.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductSerializer(products, many=True, context={'request': request})
         return Response(serializer.data)
