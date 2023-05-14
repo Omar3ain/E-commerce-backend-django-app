@@ -55,8 +55,9 @@ class WishlistItemView(APIView):
         try: 
             user = request.user
             self.check_object_permissions(request, user)
-            wish_list= Wishlist.objects.get(user_id=user.id, pk=pk)
+            wish_list= Wishlist.objects.get(user_id=user.id, product_id=pk)
             serializer = wishlistSerializer(wish_list)
+            print(serializer)
             return Response({"wishlist":serializer.data})    
         except:
             return Response({'error':'item does not exist'}, status=status.HTTP_404_NOT_FOUND)
@@ -65,9 +66,9 @@ class WishlistItemView(APIView):
         try: 
             user = request.user
             self.check_object_permissions(request, user)
-            wish_list= Wishlist.objects.get(user_id=user.id, pk=pk)
+            wish_list= Wishlist.objects.get(user_id=user.id, product_id=pk)
             wish_list.delete()       
-            return Response(status=status.HTTP_204_NO_CONTENT) 
+            return Response({'product': wish_list.product.id},status=status.HTTP_204_NO_CONTENT) 
         except:
             return Response({'error':'item does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
