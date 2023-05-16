@@ -14,6 +14,7 @@ class Order(models.Model):
     total_amount = models.IntegerField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0])
     country = CountryField(null=True)
+    city = models.TextField(null=True)
     street_name = models.TextField(null=True)
     building_no =models.IntegerField(null=True)
     floor_no =models.IntegerField(null=True)    

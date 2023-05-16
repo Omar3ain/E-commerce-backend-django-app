@@ -15,13 +15,22 @@ class HandleOrder(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     serializer_class = AddressSerializer
     
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        try:
+            order = Order.objects.filter(user_id=request.user.id)
+            orderRes = OrderSerializer(order, many=True)
+            return Response({"order":orderRes.data})
+        except Order.DoesNotExist:
+            return Response({"error":"order doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request):
         self.check_object_permissions(request, request.user)
         address_serializer = AddressSerializer(data=request.data)
         if address_serializer.is_valid():
             try:
                 cart = Cart.objects.get(user_id=request.user.id)
-            except:
+            except Cart.DoesNotExist:
                 return Response({"error":"cart doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
             
             cartItems = CartItem.objects.filter(cart_id=cart.id)
@@ -31,6 +40,7 @@ class HandleOrder(APIView):
     
                 order = Order.objects.create(user_id=request.user, total_amount=0)
                 order.street_name = address_serializer.data['street_name']
+                order.city = address_serializer.data['city']
                 order.country = address_serializer.data['country']
                 order.building_no = address_serializer.data['building_no']
                 order.floor_no = address_serializer.data['floor_no']
@@ -64,10 +74,22 @@ class HandleOrder(APIView):
                 return Response({"error": 'order item not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(address_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FindOrder(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get(self,request,orderId):
+        self.check_object_permissions(request, request.user)
+        try:
+            orderItems = OrderItem.objects.filter(order=orderId)
+            orderItemsRes = OrderItemSerializer(orderItems, many=True)
+            return Response({"order":orderItemsRes.data})
+        except OrderItem.DoesNotExist:
+            return Response({"error":"order doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
     def delete(self, request, orderId):
         self.check_object_permissions(request, request.user)
-        orderExists = Payment.objects.filter(order=orderId).exists()
-        if not orderExists:
+        orderExists = Payment.objects.filter(order=orderId, status = 'requires_payment_method').exists()
+        if orderExists:
             try:
                 order = Order.objects.filter(id=orderId).first()
                 orderItems = OrderItem.objects.filter(order=orderId)
@@ -87,5 +109,3 @@ class HandleOrder(APIView):
                 #     return Response({"error": e}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"error": "Can't cancel this order"}, status=status.HTTP_400_BAD_REQUEST)
-
-
