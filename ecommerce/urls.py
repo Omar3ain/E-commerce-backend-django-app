@@ -20,12 +20,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('user/', include('users.urls')),
     path('categories/', include('category.urls')),
     path('products/', include('products.urls')),
+    path('jet/', include('jet.urls', 'jet')),
+    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
 ]
 
 # if settings.DEBUG:
