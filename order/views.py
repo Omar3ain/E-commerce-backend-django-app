@@ -10,6 +10,7 @@ from cart.models import Cart, CartItem
 from products.models import Product
 from payments.models import Payment
 import logging
+from django.db.models import Prefetch
 
 class HandleOrder(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -18,8 +19,9 @@ class HandleOrder(APIView):
     def get(self, request):
         self.check_object_permissions(request, request.user)
         try:
-            order = Order.objects.filter(user_id=request.user.id)
-            orderRes = OrderSerializer(order, many=True)
+            orders = Order.objects.filter(user_id=request.user.id).order_by('-createdAt')
+            orderRes = OrderSerializer(orders, many=True)
+
             return Response({"order":orderRes.data})
         except Order.DoesNotExist:
             return Response({"error":"order doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
@@ -46,7 +48,7 @@ class HandleOrder(APIView):
                 order.floor_no = address_serializer.data['floor_no']
                 order.apartment_no = address_serializer.data['apartment_no']
                 order.save()
-                for item in cartItems:
+                for item in cartItems:  
                     if item.product_id.quantity >= item.quantity:
                         product = Product.objects.get(id=item.product_id.id)
                         product.quantity -= item.quantity
@@ -98,7 +100,7 @@ class FindOrder(APIView):
                     product.quantity += item.quantity
                     product.save()
                 order.delete()
-                return Response({'success': "order canceled successfully"})
+                return Response({'orderId':orderId, 'success':'order canceled'}) 
             except OrderItem.DoesNotExist:
                 return Response({"error": 'order item not found'}, status=status.HTTP_404_NOT_FOUND)
             except Order.DoesNotExist:
