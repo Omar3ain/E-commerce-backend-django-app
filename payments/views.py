@@ -112,3 +112,18 @@ class CancelPayment(APIView):
                 return Response({'error' : 'The payment already canceled' }, status= status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error' : str(e)})
+        
+class UpdatePayment(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    def put(self, request, orderId):
+            user = request.user
+            self.check_object_permissions(request, user)
+            payment = Payment.objects.filter(order=orderId).first()
+            query = "metadata['orderId']:'"+ str(orderId)+"'"
+            currentStatus = stripe.PaymentIntent.search(
+            query=query,
+            )
+            if payment.status != currentStatus.data[0].status:
+                payment.status = currentStatus.data[0].status
+                payment.save()
+            return Response(status= status.HTTP_204_NO_CONTENT)
