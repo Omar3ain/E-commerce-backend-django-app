@@ -7,6 +7,8 @@ STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('SHIPPING', 'Shipping'),
         ('DELIVERED', 'Delivered'),
+        ('CANCELED','Canceled'),
+        ('REFUNDED','Refunded'),
 ]
 
 class Order(models.Model):

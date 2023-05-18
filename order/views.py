@@ -11,6 +11,11 @@ from products.models import Product
 from payments.models import Payment
 import logging
 from django.db.models import Prefetch
+import stripe
+from django.conf import settings
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class HandleOrder(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -90,7 +95,7 @@ class FindOrder(APIView):
             return Response({"error":"order doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
     def delete(self, request, orderId):
         self.check_object_permissions(request, request.user)
-        orderExists = Payment.objects.filter(order=orderId, status = 'requires_payment_method').exists()
+        orderExists = Payment.objects.filter(order=orderId, status = 'requires_payment_method').first()
         if orderExists:
             try:
                 order = Order.objects.filter(id=orderId).first()
@@ -99,6 +104,11 @@ class FindOrder(APIView):
                     product = Product.objects.get(id=item.product.id)
                     product.quantity += item.quantity
                     product.save()
+                
+                stripe.PaymentIntent.cancel(
+                    orderExists.stripe_charge_id,
+                )
+                
                 order.delete()
                 return Response({'orderId':orderId, 'success':'order canceled'}) 
             except OrderItem.DoesNotExist:
