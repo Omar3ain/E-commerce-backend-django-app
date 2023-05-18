@@ -12,3 +12,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.main_image:
+            image_url = self.main_image.url
+            if self.image_urls:
+                self.image_urls += f',{image_url}'
+            else:
+                self.image_urls = image_url
+
+        super().save(*args, **kwargs)
