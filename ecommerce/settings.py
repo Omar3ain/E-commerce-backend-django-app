@@ -15,6 +15,7 @@ from pathlib import Path
 from datetime import timedelta
 import environ
 import cloudinary_storage
+import dj_database_url
 
 env = environ.Env(
     # set casting, default value
@@ -105,10 +106,7 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(env('DATABASE_URL'))
 }
 
 
