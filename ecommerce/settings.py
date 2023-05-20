@@ -81,6 +81,7 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173',  # Replace with your frontend domain and port
     'https://sellio-ecommerce.onrender.com',
     'https://js.stripe.com',
+    'https://main--effulgent-brigadeiros-9112b8.netlify.app',
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
