@@ -61,7 +61,7 @@ class GetCart(APIView):
             cart = Cart.objects.get(user_id = request.user.id)
             cartitems = CartItem.objects.filter(cart_id=cart.id)
         except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Cart is empty"}, status=status.HTTP_404_NOT_FOUND)
         except CartItem.DoesNotExist:
             return Response({"error": "Cart Itemss not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -95,7 +95,7 @@ class DeleteCartItem(APIView):
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
         except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Cart is empty"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -116,11 +116,13 @@ class AddQuantity(APIView):
                 return Response({"item": serializer.data}, status=status.HTTP_200_OK)
             elif cartItem.quantity < 0:
                 return Response({"error": "Invalid quantity for cart item"}, status=status.HTTP_400_BAD_REQUEST)
+            elif cartItem.quantity > cartItem.product_id.quantity:
+                return Response({"error": "Out of Stock"}, status=status.HTTP_400_BAD_REQUEST)
         except CartItem.DoesNotExist:
             return Response({"error": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
         except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Cart is empty"}, status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({"error": "internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
