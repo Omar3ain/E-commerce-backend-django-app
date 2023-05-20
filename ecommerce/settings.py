@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['sellio-ecommerce-app.onrender.com']
+ALLOWED_HOSTS = ['sellio-ecommerce-app.onrender.com', 'https://sellio-ecommerce.onrender.com/']
 
 
 # Application definition
