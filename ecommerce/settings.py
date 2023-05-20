@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['sellio-ecommerce-app.onrender.com']
+ALLOWED_HOSTS = ['sellio-ecommerce-app.onrender.com', 'https://js.stripe.com']
 
 
 # Application definition
@@ -80,6 +80,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173',  # Replace with your frontend domain and port
     'https://sellio-ecommerce.onrender.com',
+    'https://js.stripe.com',
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
