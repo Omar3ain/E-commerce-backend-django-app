@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import User
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from ecommerce.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -54,7 +54,6 @@ class GetUserView(APIView):
     
 
 class CreateUserView(generics.CreateAPIView):
-    # permission_classes = [IsAdminUser | AllowAny]
     permission_classes = [IsAdminOrUnauthenticatedUser]
     serializer_class = UserSerializer
 
@@ -110,6 +109,11 @@ class CustomAuthToken(ObtainAuthToken):
             'address': user.address,
             'image': image_url,
             'isAdmin': user.is_superuser,
+            'country': str(user.country),
+            'street_name': user.street_name,
+            'building_no': user.building_no,
+            'floor_no': user.floor_no,
+            'apartment_no': user.apartment_no,
         }
         # Merge the user data with the token data
         response_data = {
